@@ -2,6 +2,7 @@
 import threading
 from traffic_monitor import TrafficMonitor
 from latency_test import latency_test
+from speed_test import run_speed_test
 
 stop_event = threading.Event()
 monitor = TrafficMonitor()
@@ -47,6 +48,17 @@ if __name__ == "__main__":
                         print(f"IP: {ip} | Latency: {latency} ms")
                     else:
                         print(f"IP: {ip} | Timed Out")
+
+            print("\n------------------------------------------------------------------------------------------------------\n")
+
+            # Run speed test
+            print("\n----- Speed Test Per IP -----")
+            speed = run_speed_test()
+            if speed:
+                print(f"Download Speed: {speed['download_speed']} Mbps")
+                print(f"Upload Speed: {speed['upload_speed']} Mbps")
+            else:
+                print("[ERROR] speed test failed.")
 
             print("\n------------------------------------------------------------------------------------------------------\n")
 

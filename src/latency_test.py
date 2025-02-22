@@ -12,17 +12,18 @@ Function to perform latency test
     else None
 '''
 def latency_test(target_ip, timeout=2):
-    packet = IP(dst=target_ip)/ICMP() #make ICMP packet
+    try:
+        packet = IP(dst=target_ip, ttl=64)/ICMP() #make ICMP packet
 
-    start_time = time.time()
+        start_time = time.time()
+        reply = sr1(packet, timeout=timeout, verbose=False) #send packet and wait for reply
 
-    reply = sr1(packet, timeout=timeout, verbose=False) #send packet and wait for reply
+        if reply:
+            latency_ms = (reply.time - start_time) * 1000  #convert to ms
+            return round(latency_ms, 2)
+    
+    except Exception as e:
+        print(f"[ERROR] Failed to ping {target_ip}: {e}")
 
-    end_time = time.time()
-
-    if reply:
-        latency_ms = (end_time - start_time) * 1000  #convert to ms
-        return round(latency_ms, 2)
-    else:
-        return None
+    return None
 
