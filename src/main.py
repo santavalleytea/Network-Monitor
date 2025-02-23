@@ -3,6 +3,7 @@ import threading
 from traffic_monitor import TrafficMonitor
 from latency_test import latency_test
 from speed_test import run_speed_test
+from logger import log_data
 
 stop_event = threading.Event()
 monitor = TrafficMonitor()
@@ -24,13 +25,12 @@ if __name__ == "__main__":
     #print packet traffic after some time 
     try:
         while True:
-            # print("----- Total Packet Traffic:", get_total_traffic(), "-----")
-            # print("Packet Counts Per IP:", get_packet_counts())
-
             print("\n------------------------------------------------------------------------------------------------------\n")
 
+            # Traffic Stats
+            traffice_data = monitor.get_total_traffic()
             print("----- Total Packet Traffic -----")
-            print(f"Total Bytes: {monitor.get_total_traffic()} \n")
+            print(f"Total Bytes: {traffice_data} \n")
 
             print("----- Packet Counts Per IP -----")
             packet_counts = monitor.get_packet_counts()
@@ -40,6 +40,7 @@ if __name__ == "__main__":
                 
             # Run latency test
             print("\n----- Latency Per IP -----")
+            latency_data = {}
             if packet_counts:
                 packet_counts_copy = packet_counts.copy()  # Make a copy to avoid RuntimeError
                 for ip in packet_counts_copy.keys():
@@ -61,6 +62,13 @@ if __name__ == "__main__":
                 print("[ERROR] speed test failed.")
 
             print("\n------------------------------------------------------------------------------------------------------\n")
+
+            log_data(
+                monitor.get_total_traffic(),  # Traffic stats
+                packet_counts,  # Packet counts per IP
+                latency_data,  # Latency test results
+                speed  # Speed test results
+            )
 
             stop_event.wait(5)  # Wait 5 seconds before the next print
 
