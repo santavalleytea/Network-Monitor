@@ -13,6 +13,17 @@ def initialize_log():
         with open(LOG_FILE, 'w') as file:
             # Empty log list
             json.dump([], file)
+    else:
+        # Ensure file has valid JSON 
+        with open(LOG_FILE, 'r') as file:
+            try:
+                data = json.load(file)
+                if not isinstance(data, list):
+                    raise ValueError
+            except (json.JSONDecodeError, ValueError):
+                with open(LOG_FILE, 'w') as file:
+                    # Reset file if corrupt
+                    json.dump([], file)
 
 def log_data(traffic_data, packet_count, latency_data, speed_data):
     log_entry = {
@@ -22,6 +33,8 @@ def log_data(traffic_data, packet_count, latency_data, speed_data):
         "latency": latency_data,
         "speed": speed_data
     }
+
+    initialize_log()
 
     # Read file
     with open(LOG_FILE, 'r') as file:

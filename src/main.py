@@ -1,5 +1,6 @@
 # main script
 import threading
+import os
 from traffic_monitor import TrafficMonitor
 from latency_test import latency_test
 from speed_test import run_speed_test
@@ -7,6 +8,7 @@ from logger import log_data
 
 stop_event = threading.Event()
 monitor = TrafficMonitor()
+LOG_FILE = "logs.json"
 
 '''
 Callback function to handle network traffic
@@ -78,5 +80,9 @@ if __name__ == "__main__":
         monitor.stop_monitoring()  # Stop the network sniffer
         monitor_thread.join()  # Ensure the monitoring thread stops
         print("Network monitor stopped.")
-
-
+        
+        if os.path.exists(LOG_FILE):
+            os.remove(LOG_FILE)
+            print(f"{LOG_FILE} deleted.")
+        else:
+            print(f"{LOG_FILE} not found, no need to delete.")

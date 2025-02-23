@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Monitor Dashboard</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script>
+        function refreshData() {
+            $.getJSON("/api/data", function(data) {
+                if (Object.keys(data).length > 0) {
+                    $("#bytes-in").text(data.traffic.total_bytes_in + " bytes");
+                    $("#bytes-out").text(data.traffic.total_bytes_out + " bytes");
+
+                    $("#latency-data").empty();
+                    $.each(data.latency, function(ip, latency) {
+                        $("#latency-data").append("<tr><td>" + ip + "</td><td>" + latency + " ms</td></tr>");
+                    });
+
+                    $("#speed-download").text(data.speed.download_speed + " Mbps");
+                    $("#speed-upload").text(data.speed.upload_speed + " Mbps");
+                    $("#speed-ping").text(data.speed.ping + " ms");
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            refreshData();
+            setInterval(refreshData, 5000);  // Auto-refresh every 5 seconds
+        });
+    </script>
+</head>
+<body class="container mt-5">
+    <h1 class="text-center">📡 Network Monitoring Dashboard</h1>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <h3>Traffic Stats</h3>
+            <p><strong>Bytes In:</strong> <span id="bytes-in">Loading...</span></p>
+            <p><strong>Bytes Out:</strong> <span id="bytes-out">Loading...</span></p>
+        </div>
+        <div class="col-md-6">
+            <h3>Speed Test</h3>
+            <p><strong>Download Speed:</strong> <span id="speed-download">Loading...</span></p>
+            <p><strong>Upload Speed:</strong> <span id="speed-upload">Loading...</span></p>
+            <p><strong>Ping:</strong> <span id="speed-ping">Loading...</span></p>
+        </div>
+    </div>
+
+    <h3 class="mt-4">Latency Per IP</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>IP Address</th>
+                <th>Latency (ms)</th>
+            </tr>
+        </thead>
+        <tbody id="latency-data">
+            <tr><td colspan="2">Loading...</td></tr>
+        </tbody>
+    </table>
+</body>
+</html>
